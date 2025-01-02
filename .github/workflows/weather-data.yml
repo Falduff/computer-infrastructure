@@ -1,0 +1,30 @@
+name: Automate Weather Data Collection
+
+on:
+  schedule:
+    - cron: '0 10 * * *'  # Run daily at 10am
+  workflow_dispatch:
+
+jobs:
+  collect-weather-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      #Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      #Execute the weather.sh script
+      - name: Run weather.sh script
+        run: |
+          chmod +x weather.sh  # Ensure the script is executable
+          ./weather.sh
+
+      #Commit and push changes
+      - name: Commit and push weather data
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add data/weather/
+          git commit -m "Add updated weather data [skip ci]" || echo "No changes to commit"
+          git push
